@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080/api';
 
 app.use(cors());
 app.use(bodyParser.json());
