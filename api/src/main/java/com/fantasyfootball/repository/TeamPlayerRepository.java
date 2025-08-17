@@ -21,11 +21,20 @@ public interface TeamPlayerRepository extends JpaRepository<TeamPlayer, Integer>
     @Query("SELECT tp FROM TeamPlayer tp LEFT JOIN FETCH tp.player p LEFT JOIN FETCH p.nflTeam WHERE tp.team.id = :teamId")
     List<TeamPlayer> findByTeamIdWithPlayerDetails(@Param("teamId") Integer teamId);
     
-    @Query("SELECT tp FROM TeamPlayer tp WHERE tp.team.id = :teamId AND tp.isStarter = true")
+    @Query("SELECT tp FROM TeamPlayer tp JOIN FETCH tp.rosterPositionEntity rpe WHERE tp.team.id = :teamId AND rpe.isStarting = true ORDER BY rpe.displayOrder")
     List<TeamPlayer> findStartersByTeamId(@Param("teamId") Integer teamId);
     
-    @Query("SELECT tp FROM TeamPlayer tp WHERE tp.team.id = :teamId AND tp.isStarter = false")
+    @Query("SELECT tp FROM TeamPlayer tp JOIN FETCH tp.rosterPositionEntity rpe WHERE tp.team.id = :teamId AND rpe.isStarting = false")
     List<TeamPlayer> findBenchPlayersByTeamId(@Param("teamId") Integer teamId);
+    
+    @Query("SELECT tp FROM TeamPlayer tp WHERE tp.team.id = :teamId AND tp.rosterPosition = :rosterPosition")
+    List<TeamPlayer> findByTeamIdAndRosterPosition(@Param("teamId") Integer teamId, @Param("rosterPosition") String rosterPosition);
+    
+    @Query("SELECT tp FROM TeamPlayer tp WHERE tp.team.id = :teamId AND tp.rosterPosition = :rosterPosition")
+    Optional<TeamPlayer> findByTeamIdAndRosterPositionSingle(@Param("teamId") Integer teamId, @Param("rosterPosition") String rosterPosition);
+    
+    @Query("SELECT COUNT(tp) FROM TeamPlayer tp WHERE tp.team.id = :teamId AND tp.rosterPosition = :rosterPosition")
+    long countByTeamIdAndRosterPosition(@Param("teamId") Integer teamId, @Param("rosterPosition") String rosterPosition);
     
     @Query("SELECT COUNT(tp) FROM TeamPlayer tp WHERE tp.team.id = :teamId")
     long countByTeamId(@Param("teamId") Integer teamId);

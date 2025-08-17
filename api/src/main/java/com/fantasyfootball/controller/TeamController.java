@@ -2,6 +2,7 @@ package com.fantasyfootball.controller;
 
 import com.fantasyfootball.entity.Team;
 import com.fantasyfootball.entity.TeamPlayer;
+import com.fantasyfootball.entity.RosterPosition;
 import com.fantasyfootball.service.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -101,10 +102,10 @@ public class TeamController {
     public ResponseEntity<TeamPlayer> addPlayerToTeam(
             @PathVariable Integer teamId,
             @PathVariable Integer playerId,
-            @RequestParam(required = false) String positionOnTeam,
+            @RequestParam String rosterPosition,
             @RequestParam(required = false, defaultValue = "0.0") BigDecimal cost) {
         try {
-            TeamPlayer teamPlayer = teamService.addPlayerToTeam(teamId, playerId, positionOnTeam, cost);
+            TeamPlayer teamPlayer = teamService.addPlayerToTeam(teamId, playerId, rosterPosition, cost);
             return ResponseEntity.ok(teamPlayer);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().build();
@@ -123,17 +124,37 @@ public class TeamController {
         }
     }
     
-    @PutMapping("/{teamId}/players/{playerId}/starter-status")
-    public ResponseEntity<TeamPlayer> updatePlayerStarterStatus(
+    @PutMapping("/{teamId}/players/{playerId}/roster-position")
+    public ResponseEntity<TeamPlayer> movePlayerToRosterPosition(
             @PathVariable Integer teamId,
             @PathVariable Integer playerId,
-            @RequestParam Boolean isStarter) {
+            @RequestParam String rosterPosition) {
         try {
-            TeamPlayer teamPlayer = teamService.updatePlayerStatus(teamId, playerId, isStarter);
+            TeamPlayer teamPlayer = teamService.movePlayerToRosterPosition(teamId, playerId, rosterPosition);
             return ResponseEntity.ok(teamPlayer);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().build();
         }
+    }
+    
+    @GetMapping("/roster-positions")
+    public ResponseEntity<List<RosterPosition>> getAllRosterPositions() {
+        List<RosterPosition> positions = teamService.getAllRosterPositions();
+        return ResponseEntity.ok(positions);
+    }
+    
+    @GetMapping("/roster-positions/starting")
+    public ResponseEntity<List<RosterPosition>> getStartingPositions() {
+        List<RosterPosition> positions = teamService.getStartingPositions();
+        return ResponseEntity.ok(positions);
+    }
+    
+    @GetMapping("/{teamId}/players/position/{rosterPosition}")
+    public ResponseEntity<List<TeamPlayer>> getPlayersByRosterPosition(
+            @PathVariable Integer teamId,
+            @PathVariable String rosterPosition) {
+        List<TeamPlayer> players = teamService.getPlayersByRosterPosition(teamId, rosterPosition);
+        return ResponseEntity.ok(players);
     }
     
     @GetMapping("/{id}/size")

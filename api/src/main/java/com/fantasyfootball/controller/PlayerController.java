@@ -74,6 +74,31 @@ public class PlayerController {
         return ResponseEntity.ok(players);
     }
     
+    @GetMapping("/regular/position/{position}")
+    public ResponseEntity<List<Player>> getRegularPlayersByPosition(@PathVariable String position) {
+        List<Player> players = playerService.getRegularPlayersByPosition(position);
+        return ResponseEntity.ok(players);
+    }
+    
+    @GetMapping("/defenses")
+    public ResponseEntity<List<Player>> getAllDefenseUnits() {
+        List<Player> defenses = playerService.getAllDefenseUnits();
+        return ResponseEntity.ok(defenses);
+    }
+    
+    @GetMapping("/regular")
+    public ResponseEntity<List<Player>> getAllRegularPlayers() {
+        List<Player> players = playerService.getAllRegularPlayers();
+        return ResponseEntity.ok(players);
+    }
+    
+    @GetMapping("/defenses/nfl-team/{nflTeamId}")
+    public ResponseEntity<Player> getDefenseByNflTeam(@PathVariable Integer nflTeamId) {
+        Optional<Player> defense = playerService.getDefenseByNflTeam(nflTeamId);
+        return defense.map(ResponseEntity::ok)
+                     .orElse(ResponseEntity.notFound().build());
+    }
+    
     @PostMapping
     public ResponseEntity<Player> createPlayer(@RequestBody Player player) {
         try {

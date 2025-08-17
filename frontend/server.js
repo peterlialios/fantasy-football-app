@@ -52,6 +52,24 @@ app.get('/team/:id', async (req, res) => {
     }
 });
 
+// Team creation route
+app.post('/teams/create', async (req, res) => {
+    try {
+        const { teamName, ownerId } = req.body;
+        
+        const response = await axios.post(`${API_BASE_URL}/teams`, {
+            name: teamName,
+            ownerId: ownerId || 1, // Default to demo user
+            budget: 100.00
+        });
+        
+        res.json({ success: true, team: response.data });
+    } catch (error) {
+        console.error('Error creating team:', error.message);
+        res.status(400).json({ success: false, error: 'Failed to create team' });
+    }
+});
+
 app.get('/players', async (req, res) => {
     try {
         const searchName = req.query.search || '';
@@ -93,7 +111,7 @@ app.post('/api/teams/:teamId/add-player/:playerId', async (req, res) => {
         const { positionOnTeam, cost } = req.body;
         
         const response = await axios.post(
-            `${API_BASE_URL}/teams/${teamId}/players/${playerId}?positionOnTeam=${positionOnTeam}&cost=${cost || 0}`
+            `${API_BASE_URL}/teams/${teamId}/players/${playerId}?rosterPosition=${positionOnTeam}&cost=${cost || 0}`
         );
         
         res.json({ success: true, data: response.data });
@@ -122,7 +140,7 @@ app.put('/api/teams/:teamId/players/:playerId/starter-status', async (req, res) 
         const { isStarter } = req.body;
         
         const response = await axios.put(
-            `${API_BASE_URL}/teams/${teamId}/players/${playerId}/starter-status?isStarter=${isStarter}`
+            `${API_BASE_URL}/teams/${teamId}/players/${playerId}/roster-position?rosterPosition=${isStarter ? 'STARTER' : 'BENCH'}`
         );
         
         res.json({ success: true, data: response.data });

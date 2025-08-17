@@ -2,6 +2,7 @@ package com.fantasyfootball.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -24,8 +25,13 @@ public class TeamPlayer {
     @JoinColumn(name = "player_id", nullable = false)
     private Player player;
     
-    @Column(name = "position_on_team")
-    private String positionOnTeam;
+    @NotBlank
+    @Column(name = "roster_position", nullable = false, length = 10)
+    private String rosterPosition;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "roster_position", referencedColumnName = "position_code", insertable = false, updatable = false)
+    private RosterPosition rosterPositionEntity;
     
     @Column(name = "acquisition_date")
     private LocalDateTime acquisitionDate;
@@ -33,14 +39,15 @@ public class TeamPlayer {
     @Column(precision = 8, scale = 2)
     private BigDecimal cost = BigDecimal.ZERO;
     
-    @Column(name = "is_starter")
-    private Boolean isStarter = false;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
     
     @PrePersist
     protected void onCreate() {
         if (acquisitionDate == null) {
             acquisitionDate = LocalDateTime.now();
         }
+        createdAt = LocalDateTime.now();
     }
 
     public Integer getId() {
@@ -67,12 +74,20 @@ public class TeamPlayer {
         this.player = player;
     }
 
-    public String getPositionOnTeam() {
-        return positionOnTeam;
+    public String getRosterPosition() {
+        return rosterPosition;
     }
 
-    public void setPositionOnTeam(String positionOnTeam) {
-        this.positionOnTeam = positionOnTeam;
+    public void setRosterPosition(String rosterPosition) {
+        this.rosterPosition = rosterPosition;
+    }
+    
+    public RosterPosition getRosterPositionEntity() {
+        return rosterPositionEntity;
+    }
+    
+    public void setRosterPositionEntity(RosterPosition rosterPositionEntity) {
+        this.rosterPositionEntity = rosterPositionEntity;
     }
 
     public LocalDateTime getAcquisitionDate() {
@@ -91,11 +106,18 @@ public class TeamPlayer {
         this.cost = cost;
     }
 
-    public Boolean getIsStarter() {
-        return isStarter;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setIsStarter(Boolean isStarter) {
-        this.isStarter = isStarter;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    // Convenience method to check if this is a starting position
+    public Boolean isStartingPosition() {
+        return rosterPositionEntity != null && 
+               rosterPositionEntity.getIsStarting() != null && 
+               rosterPositionEntity.getIsStarting();
     }
 }

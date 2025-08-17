@@ -75,6 +75,96 @@ class ToastManager {
 
 const toast = new ToastManager();
 
+// Team creation functionality
+async function createTeam() {
+    try {
+        const modal = createTeamInputModal();
+        const teamName = await showModal(modal);
+        
+        if (teamName === null || !teamName.trim()) {
+            if (teamName === '') {
+                toast.show('Please enter a team name', 'error');
+            }
+            return;
+        }
+        
+        // Show loading
+        const loadingToast = showLoading('Creating team...');
+        
+        const response = await fetch('/teams/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                teamName: teamName.trim(),
+                ownerId: 1 // Default to demo user
+            })
+        });
+        
+        hideLoading(loadingToast);
+        
+        const data = await response.json();
+        
+        if (data.success || response.ok) {
+            toast.show('Team created successfully!', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            toast.show('Failed to create team: ' + (data.error || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        toast.show('An error occurred while creating the team', 'error');
+    }
+}
+
+// Create team input modal
+function createTeamInputModal() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    `;
+    
+    const content = document.createElement('div');
+    content.style.cssText = `
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 90%;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    `;
+    
+    content.innerHTML = `
+        <h3 style="margin: 0 0 1rem 0; color: #1e293b; font-size: 1.25rem;">Create New Team</h3>
+        <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #374151;">Team Name</label>
+            <input type="text" id="team-name-input" placeholder="Enter your team name" 
+                   style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem;">
+        </div>
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <button id="cancel-btn" style="padding: 0.5rem 1rem; border: 2px solid #e5e7eb; background: white; color: #374151; border-radius: 6px; cursor: pointer;">Cancel</button>
+            <button id="confirm-btn" style="padding: 0.5rem 1rem; border: none; background: #3b82f6; color: white; border-radius: 6px; cursor: pointer;">Create Team</button>
+        </div>
+    `;
+    
+    modal.appendChild(content);
+    return modal;
+}
+
 // Enhanced Player Management Functions
 async function addPlayerToTeam(teamId, playerId, position) {
     try {
@@ -177,12 +267,14 @@ function showModal(modal) {
             modal.firstElementChild.style.transform = 'scale(1)';
         }, 10);
         
-        const input = modal.querySelector('#player-cost-input');
+        const input = modal.querySelector('#player-cost-input') || modal.querySelector('#team-name-input');
         const cancelBtn = modal.querySelector('#cancel-btn');
         const confirmBtn = modal.querySelector('#confirm-btn');
         
-        input.focus();
-        input.select();
+        if (input) {
+            input.focus();
+            input.select();
+        }
         
         function cleanup(result) {
             modal.style.opacity = '0';
@@ -473,6 +565,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     `;
     document.head.appendChild(rippleStyle);
+    
+    // Add event listener for Create Team button
+    const createTeamButtons = document.querySelectorAll('button');
+    createTeamButtons.forEach(button => {
+        if (button.textContent.trim() === 'Create Team') {
+            button.addEventListener('click', createTeam);
+        }
+    });
     
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

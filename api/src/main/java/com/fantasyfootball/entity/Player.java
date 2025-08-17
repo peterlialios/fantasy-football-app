@@ -17,12 +17,10 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     
-    @NotBlank
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name")
     private String firstName;
     
-    @NotBlank
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name")
     private String lastName;
     
     @NotBlank
@@ -57,6 +55,13 @@ public class Player {
     
     @Column(name = "is_active")
     private Boolean isActive = true;
+    
+    // Special handling for Defense/Special Teams
+    @Column(name = "is_dst")
+    private Boolean isDst = false;
+    
+    @Column(name = "dst_team_name", length = 100)
+    private String dstTeamName;
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -216,5 +221,29 @@ public class Player {
 
     public void setPlayerStats(List<PlayerStats> playerStats) {
         this.playerStats = playerStats;
+    }
+    
+    public Boolean getIsDst() {
+        return isDst;
+    }
+    
+    public void setIsDst(Boolean isDst) {
+        this.isDst = isDst;
+    }
+    
+    public String getDstTeamName() {
+        return dstTeamName;
+    }
+    
+    public void setDstTeamName(String dstTeamName) {
+        this.dstTeamName = dstTeamName;
+    }
+    
+    // Convenience method to get player display name
+    public String getDisplayName() {
+        if (isDst != null && isDst) {
+            return dstTeamName;
+        }
+        return firstName + " " + lastName;
     }
 }

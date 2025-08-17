@@ -40,6 +40,22 @@ public class PlayerService {
         return playerRepository.findActivePlayersByPosition(position);
     }
     
+    public List<Player> getRegularPlayersByPosition(String position) {
+        return playerRepository.findRegularPlayersByPosition(position);
+    }
+    
+    public List<Player> getAllDefenseUnits() {
+        return playerRepository.findAllDefenseUnits();
+    }
+    
+    public List<Player> getAllRegularPlayers() {
+        return playerRepository.findAllRegularPlayers();
+    }
+    
+    public Optional<Player> getDefenseByNflTeam(Integer nflTeamId) {
+        return playerRepository.findDefenseByNflTeamId(nflTeamId);
+    }
+    
     public List<Player> getPlayersByNflTeam(Integer nflTeamId) {
         return playerRepository.findByNflTeamId(nflTeamId);
     }
@@ -76,6 +92,8 @@ public class PlayerService {
             player.setSalary(playerDetails.getSalary());
             player.setFantasyPoints(playerDetails.getFantasyPoints());
             player.setIsActive(playerDetails.getIsActive());
+            player.setIsDst(playerDetails.getIsDst());
+            player.setDstTeamName(playerDetails.getDstTeamName());
             return playerRepository.save(player);
         } else {
             throw new RuntimeException("Player not found with id: " + id);
