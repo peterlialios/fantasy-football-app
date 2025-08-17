@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Search - Fantasy Football Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Fantasy Football</h2>
+            <ul>
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/teams">My Teams</a></li>
+                <li><a href="/players" class="<%= !position && !searchName ? 'active' : '' %>">Player Search</a></li>
+                <li><a href="/players?position=QB" class="<%= position === 'QB' ? 'active' : '' %>">Quarterbacks</a></li>
+                <li><a href="/players?position=RB" class="<%= position === 'RB' ? 'active' : '' %>">Running Backs</a></li>
+                <li><a href="/players?position=WR" class="<%= position === 'WR' ? 'active' : '' %>">Wide Receivers</a></li>
+                <li><a href="/players?position=TE" class="<%= position === 'TE' ? 'active' : '' %>">Tight Ends</a></li>
+                <li><a href="/players?position=K" class="<%= position === 'K' ? 'active' : '' %>">Kickers</a></li>
+                <li><a href="/players?position=DEF" class="<%= position === 'DEF' ? 'active' : '' %>">Defense</a></li>
+            </ul>
+        </nav>
+        
+        <main class="main-content">
+            <div class="header">
+                <h1>Player Search</h1>
+                <% if (teamId) { %>
+                    <p>Adding players to team</p>
+                    <a href="/team/<%= teamId %>" class="btn btn-primary">← Back to Team</a>
+                <% } else { %>
+                    <p>Find and explore NFL players</p>
+                <% } %>
+            </div>
+            
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <div class="content-section">
+                <form class="search-bar" method="GET" action="/players">
+                    <input type="text" name="search" placeholder="Search by player name..." value="<%= searchName || '' %>">
+                    <select name="position">
+                        <option value="">All Positions</option>
+                        <option value="QB" <%= position === 'QB' ? 'selected' : '' %>>Quarterback</option>
+                        <option value="RB" <%= position === 'RB' ? 'selected' : '' %>>Running Back</option>
+                        <option value="WR" <%= position === 'WR' ? 'selected' : '' %>>Wide Receiver</option>
+                        <option value="TE" <%= position === 'TE' ? 'selected' : '' %>>Tight End</option>
+                        <option value="K" <%= position === 'K' ? 'selected' : '' %>>Kicker</option>
+                        <option value="DEF" <%= position === 'DEF' ? 'selected' : '' %>>Defense</option>
+                    </select>
+                    <% if (teamId) { %>
+                        <input type="hidden" name="teamId" value="<%= teamId %>">
+                    <% } %>
+                    <button type="submit">Search</button>
+                    <a href="/players<%= teamId ? '?teamId=' + teamId : '' %>" class="btn">Clear</a>
+                </form>
+            </div>
+            
+            <div class="content-section">
+                <% if (players && players.length > 0) { %>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                    <th>Team</th>
+                                    <th>Fantasy Points</th>
+                                    <th>Experience</th>
+                                    <% if (teamId) { %>
+                                        <th>Actions</th>
+                                    <% } %>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% players.forEach(player => { %>
+                                    <tr>
+                                        <td>
+                                            <strong><%= player.firstName %> <%= player.lastName %></strong>
+                                            <% if (player.jerseyNumber) { %>
+                                                <span style="color: #7f8c8d;">#<%= player.jerseyNumber %></span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <span class="position-badge position-<%= player.position.toLowerCase() %>">
+                                                <%= player.position %>
+                                            </span>
+                                        </td>
+                                        <td><%= player.nflTeam ? player.nflTeam.name : 'Free Agent' %></td>
+                                        <td><%= player.fantasyPoints ? player.fantasyPoints.toFixed(1) : '0.0' %></td>
+                                        <td><%= player.yearsExperience || 0 %> years</td>
+                                        <% if (teamId) { %>
+                                            <td>
+                                                <button class="btn btn-success btn-small" 
+                                                        onclick="addPlayerToTeam(<%= teamId %>, <%= player.id %>, '<%= player.position %>')">
+                                                    Add to Team
+                                                </button>
+                                            </td>
+                                        <% } %>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div style="text-align: center; padding: 40px;">
+                        <h3>No players found</h3>
+                        <p>Try adjusting your search criteria.</p>
+                    </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Football Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Fantasy Football</h2>
+            <ul>
+                <li><a href="/" class="active">Dashboard</a></li>
+                <li><a href="/teams">My Teams</a></li>
+                <li><a href="/players">Player Search</a></li>
+                <li><a href="/players?position=QB">Quarterbacks</a></li>
+                <li><a href="/players?position=RB">Running Backs</a></li>
+                <li><a href="/players?position=WR">Wide Receivers</a></li>
+                <li><a href="/players?position=TE">Tight Ends</a></li>
+                <li><a href="/players?position=K">Kickers</a></li>
+                <li><a href="/players?position=DEF">Defense</a></li>
+            </ul>
+        </nav>
+        
+        <main class="main-content">
+            <div class="header">
+                <h1>Fantasy Football Manager</h1>
+                <p>Welcome to your fantasy football management dashboard</p>
+            </div>
+            
+            <div class="content-section">
+                <h2>Quick Actions</h2>
+                <div style="display: flex; gap: 15px; margin-top: 15px;">
+                    <a href="/teams" class="btn btn-primary">View My Teams</a>
+                    <a href="/players" class="btn btn-success">Search Players</a>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h2>About</h2>
+                <p>This fantasy football management application allows you to:</p>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li>Manage your fantasy teams</li>
+                    <li>Search and add players to your roster</li>
+                    <li>Set starting lineups</li>
+                    <li>Track player performance</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/js/app.js"></script>
+</body>
+</html>

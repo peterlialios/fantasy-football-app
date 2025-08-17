@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Fantasy Football Manager' %></title>
+    
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Meta tags for better SEO and PWA -->
+    <meta name="description" content="Fantasy Football Management Application - Manage your teams, track players, and dominate your league">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation menu">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <div class="container">
+        <nav class="sidebar" id="sidebar">
+            <h2>
+                <i class="fas fa-football-ball" style="margin-right: 0.5rem; color: #3b82f6;"></i>
+                Fantasy Football
+            </h2>
+            <ul>
+                <li>
+                    <a href="/" class="<%= page === 'home' ? 'active' : '' %>">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="/teams" class="<%= page === 'teams' ? 'active' : '' %>">
+                        <i class="fas fa-users"></i>
+                        My Teams
+                    </a>
+                </li>
+                <li>
+                    <a href="/players" class="<%= page === 'players' ? 'active' : '' %>">
+                        <i class="fas fa-search"></i>
+                        Player Search
+                    </a>
+                </li>
+                <li>
+                    <a href="/players?position=QB" class="<%= page === 'players' && position === 'QB' ? 'active' : '' %>">
+                        <span class="position-badge position-qb">QB</span>
+                        Quarterbacks
+                    </a>
+                </li>
+                <li>
+                    <a href="/players?position=RB" class="<%= page === 'players' && position === 'RB' ? 'active' : '' %>">
+                        <span class="position-badge position-rb">RB</span>
+                        Running Backs
+                    </a>
+                </li>
+                <li>
+                    <a href="/players?position=WR" class="<%= page === 'players' && position === 'WR' ? 'active' : '' %>">
+                        <span class="position-badge position-wr">WR</span>
+                        Wide Receivers
+                    </a>
+                </li>
+                <li>
+                    <a href="/players?position=TE" class="<%= page === 'players' && position === 'TE' ? 'active' : '' %>">
+                        <span class="position-badge position-te">TE</span>
+                        Tight Ends
+                    </a>
+                </li>
+                <li>
+                    <a href="/players?position=K" class="<%= page === 'players' && position === 'K' ? 'active' : '' %>">
+                        <span class="position-badge position-k">K</span>
+                        Kickers
+                    </a>
+                </li>
+                <li>
+                    <a href="/players?position=DEF" class="<%= page === 'players' && position === 'DEF' ? 'active' : '' %>">
+                        <span class="position-badge position-def">DEF</span>
+                        Defense
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        
+        <main class="main-content fade-in">
+            <%- body %>
+        </main>
+    </div>
+    
+    <script src="/js/app.js"></script>
+    <script>
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            if (mobileMenuToggle && sidebar) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                    const icon = this.querySelector('i');
+                    if (sidebar.classList.contains('open')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+                
+                // Close sidebar when clicking outside on mobile
+                document.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768 && 
+                        !sidebar.contains(e.target) && 
+                        !mobileMenuToggle.contains(e.target) &&
+                        sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                        const icon = mobileMenuToggle.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

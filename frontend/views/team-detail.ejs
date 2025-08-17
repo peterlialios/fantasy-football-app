@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= team ? team.name : 'Team' %> - Fantasy Football Manager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Fantasy Football</h2>
+            <ul>
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/teams" class="active">My Teams</a></li>
+                <li><a href="/players">Player Search</a></li>
+                <li><a href="/players?position=QB">Quarterbacks</a></li>
+                <li><a href="/players?position=RB">Running Backs</a></li>
+                <li><a href="/players?position=WR">Wide Receivers</a></li>
+                <li><a href="/players?position=TE">Tight Ends</a></li>
+                <li><a href="/players?position=K">Kickers</a></li>
+                <li><a href="/players?position=DEF">Defense</a></li>
+            </ul>
+        </nav>
+        
+        <main class="main-content">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error-message">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <% if (team) { %>
+                <div class="header">
+                    <h1><%= team.name %></h1>
+                    <p>Owner: <%= team.owner ? team.owner.username : 'Unknown' %></p>
+                    <a href="/teams" class="btn btn-primary">← Back to Teams</a>
+                    <a href="/players?teamId=<%= team.id %>" class="btn btn-success">Add Players</a>
+                </div>
+                
+                <div class="content-section">
+                    <div class="team-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">$<%= team.budget ? team.budget.toFixed(2) : '0.00' %></div>
+                            <div class="stat-label">Budget Remaining</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value"><%= roster ? roster.length : 0 %></div>
+                            <div class="stat-label">Total Players</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value"><%= roster ? roster.filter(p => p.isStarter).length : 0 %></div>
+                            <div class="stat-label">Starters</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <% if (roster && roster.length > 0) { %>
+                    <div class="content-section">
+                        <div class="roster-section">
+                            <h4>Starting Lineup</h4>
+                            <% const starters = roster.filter(p => p.isStarter); %>
+                            <% if (starters.length > 0) { %>
+                                <% starters.forEach(teamPlayer => { %>
+                                    <div class="player-item">
+                                        <div class="player-info">
+                                            <div class="player-name">
+                                                <span class="position-badge position-<%= teamPlayer.player.position.toLowerCase() %>">
+                                                    <%= teamPlayer.player.position %>
+                                                </span>
+                                                <%= teamPlayer.player.firstName %> <%= teamPlayer.player.lastName %>
+                                            </div>
+                                            <div class="player-details">
+                                                <%= teamPlayer.player.nflTeam ? teamPlayer.player.nflTeam.name : 'FA' %> | 
+                                                Position: <%= teamPlayer.positionOnTeam || teamPlayer.player.position %> | 
+                                                Cost: $<%= teamPlayer.cost ? teamPlayer.cost.toFixed(2) : '0.00' %> |
+                                                Fantasy Points: <%= teamPlayer.player.fantasyPoints ? teamPlayer.player.fantasyPoints.toFixed(1) : '0.0' %>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-small btn-danger" onclick="updatePlayerStatus(<%= team.id %>, <%= teamPlayer.player.id %>, false)">
+                                                Bench
+                                            </button>
+                                            <button class="btn btn-small btn-danger" onclick="removePlayer(<%= team.id %>, <%= teamPlayer.player.id %>)">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p>No starting players set</p>
+                            <% } %>
+                        </div>
+                        
+                        <div class="roster-section">
+                            <h4>Bench</h4>
+                            <% const bench = roster.filter(p => !p.isStarter); %>
+                            <% if (bench.length > 0) { %>
+                                <% bench.forEach(teamPlayer => { %>
+                                    <div class="player-item">
+                                        <div class="player-info">
+                                            <div class="player-name">
+                                                <span class="position-badge position-<%= teamPlayer.player.position.toLowerCase() %>">
+                                                    <%= teamPlayer.player.position %>
+                                                </span>
+                                                <%= teamPlayer.player.firstName %> <%= teamPlayer.player.lastName %>
+                                            </div>
+                                            <div class="player-details">
+                                                <%= teamPlayer.player.nflTeam ? teamPlayer.player.nflTeam.name : 'FA' %> | 
+                                                Position: <%= teamPlayer.positionOnTeam || teamPlayer.player.position %> | 
+                                                Cost: $<%= teamPlayer.cost ? teamPlayer.cost.toFixed(2) : '0.00' %> |
+                                                Fantasy Points: <%= teamPlayer.player.fantasyPoints ? teamPlayer.player.fantasyPoints.toFixed(1) : '0.0' %>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-small btn-success" onclick="updatePlayerStatus(<%= team.id %>, <%= teamPlayer.player.id %>, true)">
+                                                Start
+                                            </button>
+                                            <button class="btn btn-small btn-danger" onclick="removePlayer(<%= team.id %>, <%= teamPlayer.player.id %>)">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p>No bench players</p>
+                            <% } %>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="content-section">
+                        <div style="text-align: center; padding: 40px;">
+                            <h3>No players on roster</h3>
+                            <p>Start building your team by adding players!</p>
+                            <a href="/players?teamId=<%= team.id %>" class="btn btn-primary" style="margin-top: 15px;">Browse Players</a>
+                        </div>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="content-section">
+                    <div style="text-align: center; padding: 40px;">
+                        <h3>Team not found</h3>
+                        <p>The requested team could not be found.</p>
+                        <a href="/teams" class="btn btn-primary" style="margin-top: 15px;">Back to Teams</a>
+                    </div>
+                </div>
+            <% } %>
+        </main>
+    </div>
+    
+    <script src="/js/app.js"></script>
+</body>
+</html>
