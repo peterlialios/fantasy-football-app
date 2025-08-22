@@ -73,7 +73,7 @@ fantasy-football-app/
 
 2. Run the schema script:
    ```bash
-   psql -d fantasy_football -f database/schema.sql
+   psql -d fantasy_football -f database/complete_schema.sql
    ```
 
 ### API Setup
