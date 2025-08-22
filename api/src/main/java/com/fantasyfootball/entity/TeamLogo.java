@@ -20,7 +20,7 @@ public class TeamLogo {
     @Column(nullable = false, length = 500)
     private String href;
     
-    @Column(length = 255)
+    @Column(name = "alt_text", length = 255)
     private String alt;
     
     @Column

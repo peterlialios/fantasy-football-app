@@ -24,8 +24,8 @@ A comprehensive web-based fantasy football management system with a Java REST AP
 ```
 fantasy-football-app/
 ├── database/
-│   └── schema.sql              # PostgreSQL database schema and sample data
-├── api/                        # Java Spring Boot REST API
+│   └── complete_schema.sql    # PostgreSQL database schema and sample data
+├── api/                       # Java Spring Boot REST API
 │   ├── build.gradle           # Gradle build configuration
 │   ├── src/main/java/com/fantasyfootball/
 │   │   ├── FantasyFootballApplication.java
@@ -75,6 +75,21 @@ fantasy-football-app/
    ```bash
    psql -d fantasy_football -f database/complete_schema.sql
    ```
+
+3. **Populate the database with NFL teams and players** (optional but recommended):
+   ```bash
+   cd scripts
+   ./setup_and_run.sh
+   ```
+   
+   This script will:
+   - Set up a Python virtual environment
+   - Install required dependencies (psycopg2-binary, requests)
+   - Fetch all current NFL teams and players from ESPN's API
+   - Populate the database with ~3,000+ active NFL players
+   - Create Defense/Special Teams units for each team
+   
+   **Note**: This step requires an internet connection to fetch data from ESPN's API. The script is safe to run multiple times and will skip existing players.
 
 ### API Setup
 1. Navigate to the API directory:

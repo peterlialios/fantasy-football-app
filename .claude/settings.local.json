@@ -10,7 +10,8 @@
       "Bash(kill:*)",
       "Bash(npm start)",
       "Bash(lsof:*)",
-      "Bash(node server.js)"
+      "Bash(node server.js)",
+      "Bash(docker compose:*)"
     ],
     "deny": [],
     "ask": []

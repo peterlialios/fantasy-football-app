@@ -57,17 +57,16 @@ CREATE TABLE nfl_teams (
 CREATE TABLE team_logos (
     id SERIAL PRIMARY KEY,
     team_id INTEGER REFERENCES nfl_teams(id) ON DELETE CASCADE,
-    
-    -- Logo properties
     href VARCHAR(500) NOT NULL,                    -- Logo URL
     alt_text VARCHAR(200),                         -- Alt text
     width INTEGER,                                 -- Image width
     height INTEGER,                                -- Image height
     
-    -- Logo relationship types
-    rel_default BOOLEAN DEFAULT false,             -- Default team logo
-    rel_scoreboard BOOLEAN DEFAULT false,          -- Scoreboard logo
-    rel_breakdown BOOLEAN DEFAULT false,           -- Breakdown logo
+    -- Logo relationship types (can have multiple values)
+    rel_full BOOLEAN DEFAULT false,                -- "full" relationship
+    rel_default BOOLEAN DEFAULT false,             -- "default" relationship
+    rel_dark BOOLEAN DEFAULT false,                -- "dark" relationship
+    rel_scoreboard BOOLEAN DEFAULT false,          -- "scoreboard" relationship
     
     -- Logo flags
     is_vector BOOLEAN DEFAULT false,               -- SVG/vector format
@@ -143,38 +142,25 @@ CREATE TABLE roster_positions (
 -- Enhanced players table with ESPN integration
 CREATE TABLE players (
     id SERIAL PRIMARY KEY,
-    
-    -- ESPN API integration
     espn_id VARCHAR(20) UNIQUE,                    -- ESPN player ID
-    
-    -- Basic player information
     first_name VARCHAR(50),                        -- NULL for D/ST
     last_name VARCHAR(50),                         -- NULL for D/ST
     display_name VARCHAR(100),                     -- ESPN display name
     position VARCHAR(10) NOT NULL,                 -- QB, RB, WR, TE, K, DST, etc.
     nfl_team_id INTEGER REFERENCES nfl_teams(id),
-    
-    -- Physical attributes
     jersey_number INTEGER,                         -- NULL for D/ST
     height_inches INTEGER,                         -- NULL for D/ST
     weight_lbs INTEGER,                            -- NULL for D/ST
     age INTEGER,                                   -- Current age
     birth_date DATE,                              -- NULL for D/ST
-    
-    -- Career information
     years_experience INTEGER DEFAULT 0,
     headshot_url VARCHAR(500),                     -- ESPN headshot URL
     status VARCHAR(50),                            -- active, injured, etc.
-    
-    -- Fantasy football data
     salary DECIMAL(12,2),
     fantasy_points DECIMAL(8,2) DEFAULT 0.00,
     is_active BOOLEAN DEFAULT true,
-    
-    -- Special handling for Defense/Special Teams
     is_dst BOOLEAN DEFAULT false,                  -- true for team defenses
     dst_team_name VARCHAR(100),                    -- "Cardinals D/ST" for defenses
-    
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
@@ -325,3 +311,58 @@ CREATE TRIGGER validate_roster_before_update
 -- Insert sample user for development
 INSERT INTO users (username, email, password_hash) VALUES 
 ('demo_user', 'demo@example.com', 'demo_password_hash_placeholder');
+
+-- Insert enhanced NFL teams data based on ESPN API
+INSERT INTO nfl_teams (espn_id, espn_uid, name, nickname, location, display_name, short_display_name, abbreviation, slug, primary_color, alternate_color, is_active, is_all_star, conference, division) VALUES
+-- AFC East
+(2, 's:20~l:28~t:2', 'Bills', 'Bills', 'Buffalo', 'Buffalo Bills', 'Bills', 'BUF', 'buffalo-bills', '#00338d', '#d50a0a', true, false, 'AFC', 'East'),
+(15, 's:20~l:28~t:15', 'Dolphins', 'Dolphins', 'Miami', 'Miami Dolphins', 'Dolphins', 'MIA', 'miami-dolphins', '#008e97', '#fc4c02', true, false, 'AFC', 'East'),
+(17, 's:20~l:28~t:17', 'Patriots', 'Patriots', 'New England', 'New England Patriots', 'Patriots', 'NE', 'new-england-patriots', '#002244', '#c60c30', true, false, 'AFC', 'East'),
+(20, 's:20~l:28~t:20', 'Jets', 'Jets', 'New York', 'New York Jets', 'Jets', 'NYJ', 'new-york-jets', '#125740', '#ffffff', true, false, 'AFC', 'East'),
+
+-- AFC North
+(33, 's:20~l:28~t:33', 'Ravens', 'Ravens', 'Baltimore', 'Baltimore Ravens', 'Ravens', 'BAL', 'baltimore-ravens', '#29126f', '#000000', true, false, 'AFC', 'North'),
+(4, 's:20~l:28~t:4', 'Bengals', 'Bengals', 'Cincinnati', 'Cincinnati Bengals', 'Bengals', 'CIN', 'cincinnati-bengals', '#fb4f14', '#000000', true, false, 'AFC', 'North'),
+(5, 's:20~l:28~t:5', 'Browns', 'Browns', 'Cleveland', 'Cleveland Browns', 'Browns', 'CLE', 'cleveland-browns', '#472a08', '#ff3c00', true, false, 'AFC', 'North'),
+(23, 's:20~l:28~t:23', 'Steelers', 'Steelers', 'Pittsburgh', 'Pittsburgh Steelers', 'Steelers', 'PIT', 'pittsburgh-steelers', '#000000', '#ffb612', true, false, 'AFC', 'North'),
+
+-- AFC South
+(34, 's:20~l:28~t:34', 'Texans', 'Texans', 'Houston', 'Houston Texans', 'Texans', 'HOU', 'houston-texans', '#00143f', '#c41230', true, false, 'AFC', 'South'),
+(11, 's:20~l:28~t:11', 'Colts', 'Colts', 'Indianapolis', 'Indianapolis Colts', 'Colts', 'IND', 'indianapolis-colts', '#003b75', '#ffffff', true, false, 'AFC', 'South'),
+(30, 's:20~l:28~t:30', 'Jaguars', 'Jaguars', 'Jacksonville', 'Jacksonville Jaguars', 'Jaguars', 'JAX', 'jacksonville-jaguars', '#006778', '#d7a22a', true, false, 'AFC', 'South'),
+(10, 's:20~l:28~t:10', 'Titans', 'Titans', 'Tennessee', 'Tennessee Titans', 'Titans', 'TEN', 'tennessee-titans', '#0c2340', '#4b92db', true, false, 'AFC', 'South'),
+
+-- AFC West
+(7, 's:20~l:28~t:7', 'Broncos', 'Broncos', 'Denver', 'Denver Broncos', 'Broncos', 'DEN', 'denver-broncos', '#0a2343', '#fc4c02', true, false, 'AFC', 'West'),
+(12, 's:20~l:28~t:12', 'Chiefs', 'Chiefs', 'Kansas City', 'Kansas City Chiefs', 'Chiefs', 'KC', 'kansas-city-chiefs', '#e31837', '#ffb612', true, false, 'AFC', 'West'),
+(13, 's:20~l:28~t:13', 'Raiders', 'Raiders', 'Las Vegas', 'Las Vegas Raiders', 'Raiders', 'LV', 'las-vegas-raiders', '#000000', '#a5acaf', true, false, 'AFC', 'West'),
+(24, 's:20~l:28~t:24', 'Chargers', 'Chargers', 'Los Angeles', 'Los Angeles Chargers', 'Chargers', 'LAC', 'los-angeles-chargers', '#0080c6', '#ffc20e', true, false, 'AFC', 'West'),
+
+-- NFC East
+(6, 's:20~l:28~t:6', 'Cowboys', 'Cowboys', 'Dallas', 'Dallas Cowboys', 'Cowboys', 'DAL', 'dallas-cowboys', '#002a5c', '#b0b7bc', true, false, 'NFC', 'East'),
+(19, 's:20~l:28~t:19', 'Giants', 'Giants', 'New York', 'New York Giants', 'Giants', 'NYG', 'new-york-giants', '#0b2265', '#a71930', true, false, 'NFC', 'East'),
+(21, 's:20~l:28~t:21', 'Eagles', 'Eagles', 'Philadelphia', 'Philadelphia Eagles', 'Eagles', 'PHI', 'philadelphia-eagles', '#004c54', '#a5acaf', true, false, 'NFC', 'East'),
+(28, 's:20~l:28~t:28', 'Commanders', 'Commanders', 'Washington', 'Washington Commanders', 'Commanders', 'WAS', 'washington-commanders', '#5a1414', '#ffb612', true, false, 'NFC', 'East'),
+
+-- NFC North
+(3, 's:20~l:28~t:3', 'Bears', 'Bears', 'Chicago', 'Chicago Bears', 'Bears', 'CHI', 'chicago-bears', '#0b1c3a', '#e64100', true, false, 'NFC', 'North'),
+(8, 's:20~l:28~t:8', 'Lions', 'Lions', 'Detroit', 'Detroit Lions', 'Lions', 'DET', 'detroit-lions', '#0076b6', '#bbbbbb', true, false, 'NFC', 'North'),
+(9, 's:20~l:28~t:9', 'Packers', 'Packers', 'Green Bay', 'Green Bay Packers', 'Packers', 'GB', 'green-bay-packers', '#204e32', '#ffb612', true, false, 'NFC', 'North'),
+(16, 's:20~l:28~t:16', 'Vikings', 'Vikings', 'Minnesota', 'Minnesota Vikings', 'Vikings', 'MIN', 'minnesota-vikings', '#4f2683', '#ffc62f', true, false, 'NFC', 'North'),
+
+-- NFC South
+(1, 's:20~l:28~t:1', 'Falcons', 'Falcons', 'Atlanta', 'Atlanta Falcons', 'Falcons', 'ATL', 'atlanta-falcons', '#a71930', '#000000', true, false, 'NFC', 'South'),
+(29, 's:20~l:28~t:29', 'Panthers', 'Panthers', 'Carolina', 'Carolina Panthers', 'Panthers', 'CAR', 'carolina-panthers', '#0085ca', '#000000', true, false, 'NFC', 'South'),
+(18, 's:20~l:28~t:18', 'Saints', 'Saints', 'New Orleans', 'New Orleans Saints', 'Saints', 'NO', 'new-orleans-saints', '#9f8958', '#000000', true, false, 'NFC', 'South'),
+(27, 's:20~l:28~t:27', 'Buccaneers', 'Buccaneers', 'Tampa Bay', 'Tampa Bay Buccaneers', 'Buccaneers', 'TB', 'tampa-bay-buccaneers', '#d50a0a', '#ff7900', true, false, 'NFC', 'South'),
+
+-- NFC West
+(22, 's:20~l:28~t:22', 'Cardinals', 'Cardinals', 'Arizona', 'Arizona Cardinals', 'Cardinals', 'ARI', 'arizona-cardinals', '#a40227', '#ffffff', true, false, 'NFC', 'West'),
+(14, 's:20~l:28~t:14', 'Rams', 'Rams', 'Los Angeles', 'Los Angeles Rams', 'Rams', 'LAR', 'los-angeles-rams', '#003594', '#ffa300', true, false, 'NFC', 'West'),
+(25, 's:20~l:28~t:25', '49ers', '49ers', 'San Francisco', 'San Francisco 49ers', '49ers', 'SF', 'san-francisco-49ers', '#aa0000', '#b3995d', true, false, 'NFC', 'West'),
+(26, 's:20~l:28~t:26', 'Seahawks', 'Seahawks', 'Seattle', 'Seattle Seahawks', 'Seahawks', 'SEA', 'seattle-seahawks', '#002244', '#69be28', true, false, 'NFC', 'West');
+
+-- Insert sample Defense/Special Teams units for each NFL team
+INSERT INTO players (position, nfl_team_id, is_dst, dst_team_name, fantasy_points, is_active)
+SELECT 'DST', id, true, display_name || ' D/ST', 0.00, true
+FROM nfl_teams;

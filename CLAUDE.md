@@ -23,7 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 createdb fantasy_football
 
 # Run schema
-psql -d fantasy_football -f database/schema.sql
+psql -d fantasy_football -f database/complete_schema.sql
 ```
 
 ## Architecture Overview
