@@ -15,14 +15,15 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import json
 import time
+import os
 from typing import List, Dict, Optional
 
 # Database configuration
 DB_CONFIG = {
-    'host': 'localhost',
-    'database': 'fantasy_football',
-    'user': 'peterlialios',
-    'password': 'admin'
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'database': os.getenv('DB_NAME', 'fantasy_football'),
+    'user': os.getenv('DB_USER', 'peterlialios'),
+    'password': os.getenv('DB_PASSWORD', 'admin')
 }
 
 # API configuration

@@ -1,4 +1,4 @@
-version: '3.8'
+ version: '3.8'
 
 services:
   # PostgreSQL Database
@@ -40,6 +40,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      data-populator:
+        condition: service_completed_successfully
     networks:
       - fantasy-network
     restart: unless-stopped
@@ -49,6 +51,24 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
+  # Data Population Script
+  data-populator:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile
+    container_name: fantasy-football-data-populator
+    environment:
+      DB_HOST: postgres
+      DB_NAME: fantasy_football
+      DB_USER: peterlialios
+      DB_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fantasy-network
+    restart: "no"
 
   # Node.js Frontend
   frontend:

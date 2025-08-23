@@ -11,7 +11,8 @@
       "Bash(npm start)",
       "Bash(lsof:*)",
       "Bash(node server.js)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "WebFetch(domain:docs.anthropic.com)"
     ],
     "deny": [],
     "ask": []
